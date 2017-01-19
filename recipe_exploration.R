@@ -26,25 +26,25 @@ corrgram(df, order=TRUE, lower.panel=panel.shade,
 
 df = data[,7:ncol(data)]
 
-df$pescatarian[df$pescatarian==1] = 'YES'
-df$pescatarian[df$pescatarian==0] = 'NO'
-df$pescatarian = factor(df$pescatarian)
+df$tree.nut.free[df$tree.nut.free==1] = 'YES'
+df$tree.nut.free[df$tree.nut.free==0] = 'NO'
+df$tree.nut.free = factor(df$tree.nut.free)
 
 #Create data for training
 sample.ind = sample(2,
                     nrow(df),
                     replace = T,
-                    prob = c(0.15,0.85))
+                    prob = c(0.10,0.90))
 data.dev = df[sample.ind==1,]
 data.val = df[sample.ind==2,]
 
 
-prop.table(table(df$pescatarian))
-prop.table(table(data.dev$pescatarian))
-prop.table(table(data.val$pescatarian))
+prop.table(table(df$tree.nut.free))
+prop.table(table(data.dev$tree.nut.free))
+prop.table(table(data.val$tree.nut.free))
 
 
-rf = randomForest(pescatarian ~ .,
+rf = randomForest(tree.nut.free ~ .,
                   ntree = 150,
                   data = data.dev)
 plot(rf)
@@ -64,7 +64,7 @@ data.dev$predicted.response = predict(rf , data.dev)
 # Create Confusion Matrix
 print(
   confusionMatrix(data = data.dev$predicted.response,
-                  reference = data.dev$pescatarian,
+                  reference = data.dev$tree.nut.free,
                   positive = 'YES'))
 
 
@@ -74,15 +74,15 @@ data.val$predicted.response <- predict(rf ,data.val)
 # Create Confusion Matrix
 print(
   confusionMatrix(data=data.val$predicted.response,
-                  reference=data.val$pescatarian,
+                  reference=data.val$tree.nut.free,
                   positive='YES'))
 
 
 
 library(e1071)
-model_svm <- svm(pescatarian ~. , data=data.dev, cost = 1000, gamma = 0.01)
+model_svm <- svm(tree.nut.free ~. , data=data.dev, cost = 1000, gamma = 0.01)
 test_svm <- predict(model_svm, newdata = data.val)
-table(test_svm, data.val$pescatarian)
+table(test_svm, data.val$tree.nut.free)
 
 
 
